@@ -1,12 +1,21 @@
 const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
-const Blog = require("./Moduls/blogs");
+const Blogs = require("./Moduls/blogs");
 const app = express();
-
-app.listen(3000);
+url =
+  "mongodb+srv://islam1234:test1234@nodeexpressprojects.ihvra5o.mongodb.net/blogsIslam?retryWrites=true&w=majority";
+mongoose
+  .connect(url)
+  .then(() => {
+    app.listen(3000, () => {
+      console.log("db is conncted");
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 app.set("view engine", "ejs");
-app.use(express.static("public"));
 app.use(express.static("public"));
 app.use(morgan("dev"));
 app.use((req, res, next) => {
@@ -14,21 +23,23 @@ app.use((req, res, next) => {
   next();
 });
 app.get("/", (req, res) => {
-  const blogs = [
-    {
-      title: "Yoshi finds eggs",
-      snippet: "Lorem ipsum dolor sit amet consectetur",
-    },
-    {
-      title: "Mario finds stars",
-      snippet: "Lorem ipsum dolor sit amet consectetur",
-    },
-    {
-      title: "How to defeat bowser",
-      snippet: "Lorem ipsum dolor sit amet consectetur",
-    },
-  ];
-  res.render("index", { title: "home", blogs });
+  Blogs.find()
+    .sort({ createdAt: -1 })
+    .then((blogs) => {
+      res.render("index.ejs", { title: "blogs", blogs });
+    })
+    .catch((err) => console.log(err));
+});
+
+app.get("/add-blogs", (req, res) => {
+  const blog = new Blogs({
+    title: "new blog",
+    snippet: "about my new blog",
+    body: "more about my new blog",
+  });
+  blog.save().then((result) => {
+    res.render("index.ejs", { title: "blogs", blogs: result });
+  });
 });
 
 app.get("/about", (req, res) => {
