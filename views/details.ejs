@@ -1,0 +1,26 @@
+<html lang="en">
+<%- include("./partials/head.ejs") %>
+
+<body>
+  <%- include("./partials/nav.ejs") %>
+
+  <div class="blogs content">
+    <h2>All Blogs</h2>
+      <h3 class="title"><%= blog.title %></h3>
+      <p class="snippet"><%= blog.snippet %></p>
+      <a class="del" data-doc='<%=blog._id%>'>delete</a>
+  </div>
+  <%- include("./partials/footer.ejs") %>
+  <script>
+    const delbtn=document.querySelector('.del');
+    delbtn.addEventListener("click",(e)=>{
+        endpath=`/blogs/del-blog/${delbtn.dataset.doc}`;
+        fetch(endpath,{
+            method:"DELETE",
+        }).then((response)=> response.json())
+          .then((data) => window.location.href = data.redirect)
+          .catch(err=>console.log(err));
+    })
+  </script>
+</body>
+</html>
